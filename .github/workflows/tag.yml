@@ -54,7 +54,7 @@ jobs:
           git tag "$TAG"
 
           echo "Updating remote to use PAT_TOKEN..."
-          git remote set-url origin https://x-access-token:${PAT_TOKEN}@github.com/yaksh0210/gittatest.git
+          git remote set-url origin https://x-access-token:${NEW_TOKEN}@github.com/yaksh0210/gittatest.git
 
           echo "Pushing tag '$TAG' to origin..."
           git push origin "$TAG"
