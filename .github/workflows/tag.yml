@@ -19,18 +19,17 @@ on:
 jobs:
   tag_branch:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repo
+      - name: Checkout with PAT
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Needed to fetch all tags and branches
+          token: ${{ secrets.NEW_TOKEN }}
+          fetch-depth: 0  # Ensure full history for tagging
 
       - name: Validate branch, create and push tag
         env:
           BRANCH: ${{ github.event.inputs.branch }}
           EVT: ${{ github.event.inputs.evt }}
-          PAT_TOKEN: ${{ secrets.NEW_TOKEN }}
         run: |
           set -e
 
@@ -52,10 +51,6 @@ jobs:
           TAG="${BRANCH}-${EVT}-${DATETIME}"
           echo "Creating tag: $TAG"
           git tag "$TAG"
-
-          echo "Configuring Git to use PAT..."
-          git config --global credential.helper ""
-          git remote set-url origin https://x-access-token:${PAT_TOKEN}@github.com/yaksh0210/gittatest.git
 
           echo "Pushing tag '$TAG' to origin..."
           git push origin "$TAG"
