@@ -42,7 +42,6 @@ jobs:
             exit 1
           fi
 
-          echo "Setting Git user..."
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
@@ -54,7 +53,10 @@ jobs:
           echo "Creating tag: $TAG"
           git tag "$TAG"
 
+          echo "Updating remote to use PAT_TOKEN..."
+          git remote set-url origin https://x-access-token:${PAT_TOKEN}@github.com/yaksh0210/gittatest.git
+
           echo "Pushing tag '$TAG' to origin..."
-          git push https://x-access-token:${PAT_TOKEN}@github.com/yaksh0210/gittatest.git "$TAG"
+          git push origin "$TAG"
 
           echo "Tag '$TAG' created and pushed successfully."
