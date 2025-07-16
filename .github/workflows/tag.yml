@@ -1,5 +1,4 @@
 name: Tag Branch
-
 on:
   workflow_dispatch:
     inputs:
@@ -15,16 +14,14 @@ on:
       branch:
         description: 'Branch name to tag'
         required: true
-
 jobs:
   tag_branch:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Required to push tags
+          fetch-depth: 0  
 
       - name: Validate branch, create and push tag
         env:
@@ -48,13 +45,13 @@ jobs:
           echo "Checking out branch '$BRANCH'..."
           git checkout $BRANCH
 
-          DATETIME=$(date +'%Y%m%d%H%M%S')
+          DATETIME=$(date +'%d%m%Y%H%M')
           TAG="${BRANCH}-${EVT}-${DATETIME}"
           echo "Creating tag: $TAG"
           git tag "$TAG"
 
           echo "Updating remote to use PAT_TOKEN..."
-          git remote set-url origin https://x-access-token:${NEW_TOKEN}@github.com/yaksh0210/gittatest.git
+          git remote set-url origin https://x-access-token:${PAT_TOKEN}@github.com/yaksh0210/gittatest.git
 
           echo "Pushing tag '$TAG' to origin..."
           git push origin "$TAG"
