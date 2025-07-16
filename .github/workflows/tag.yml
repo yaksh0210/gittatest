@@ -1,4 +1,5 @@
 name: Tag Branch
+
 on:
   workflow_dispatch:
     inputs:
@@ -18,37 +19,42 @@ on:
 jobs:
   tag_branch:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # fetch all history for tags
+          fetch-depth: 0  # Required to push tags
 
-      - name: Run tag creation script
+      - name: Validate branch, create and push tag
         env:
           BRANCH: ${{ github.event.inputs.branch }}
           EVT: ${{ github.event.inputs.evt }}
+          PAT_TOKEN: ${{ secrets.NEW_TOKEN }}
         run: |
-          #!/bin/bash
           set -e
 
-          echo "Checking if branch $BRANCH exists..."
-          git fetch origin
-
-          if git show-ref --verify --quiet refs/remotes/origin/$BRANCH; then
-            echo "Branch $BRANCH found."
+          echo "Validating if branch '$BRANCH' exists on remote..."
+          if git ls-remote --heads origin "$BRANCH" | grep "$BRANCH" >/dev/null; then
+            echo "Branch '$BRANCH' found."
           else
-            echo "Branch $BRANCH not found in remote origin."
+            echo "Branch '$BRANCH' not found in remote origin."
             exit 1
           fi
 
+          echo "Setting Git user..."
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          echo "Checking out branch '$BRANCH'..."
           git checkout $BRANCH
 
           DATETIME=$(date +'%Y%m%d%H%M%S')
           TAG="${BRANCH}-${EVT}-${DATETIME}"
+          echo "Creating tag: $TAG"
+          git tag "$TAG"
 
-          echo "Creating tag $TAG"
-          git tag $TAG
+          echo "Pushing tag '$TAG' to origin..."
+          git push https://x-access-token:${PAT_TOKEN}@github.com/yaksh0210/gittatest.git "$TAG"
 
-          echo "Pushing tag $TAG"
-          git push origin $TAG
+          echo "Tag '$TAG' created and pushed successfully."
