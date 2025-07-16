@@ -1,8 +1,65 @@
-name: Tag Branch
+# name: Tag Branch
+
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       evt:
+#         description: 'Enter environment'
+#         required: true
+#       branch:
+#         description: 'Branch name to tag'
+#         required: true
+
+# jobs:
+#   tag_branch:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout with PAT
+#         uses: actions/checkout@v3
+#         with:
+#           token: ${{ secrets.NEW_TOKEN }}
+#           fetch-depth: 0
+
+#       - name: Validate branch, create and push tag
+#         env:
+#           BRANCH: ${{ github.event.inputs.branch }}
+#           EVT: ${{ github.event.inputs.evt }}
+#         run: |
+#           set -e
+
+#           echo "Validating if branch '$BRANCH' exists on remote..."
+#           if git ls-remote --heads origin "$BRANCH" | grep "$BRANCH" >/dev/null; then
+#             echo "Branch '$BRANCH' found."
+#           else
+#             echo "Branch '$BRANCH' not found in remote origin."
+#             exit 1
+#           fi
+
+#           git config user.name "github-actions[bot]"
+#           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+#           echo "Checking out branch '$BRANCH'..."
+#           git checkout "$BRANCH"
+
+#           DATETIME=$(date +'%d%m%Y%H%M')
+#           TAG="${BRANCH}-${EVT}-${DATETIME}"
+#           echo "Creating tag: $TAG"
+#           git tag "$TAG"
+
+#           echo "Pushing tag '$TAG' to origin..."
+#           git push origin "$TAG"
+
+#           echo "Tag '$TAG' created and pushed successfully."
+
+
+name: Tag External Repo Branch
 
 on:
   workflow_dispatch:
     inputs:
+      repo:
+        description: 'Repository to tag (owner/repo)'
+        required: true
       evt:
         description: 'Enter environment'
         required: true
@@ -11,21 +68,26 @@ on:
         required: true
 
 jobs:
-  tag_branch:
+  tag_external_repo:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout with PAT
+      - name: Checkout a dummy repo (required by actions/checkout)
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.NEW_TOKEN }}
           fetch-depth: 0
 
-      - name: Validate branch, create and push tag
+      - name: Clone target repo and tag branch
         env:
+          REPO: ${{ github.event.inputs.repo }}
           BRANCH: ${{ github.event.inputs.branch }}
           EVT: ${{ github.event.inputs.evt }}
+          TOKEN: ${{ secrets.NEW_TOKEN }} # token with access to target repo
         run: |
           set -e
+
+          echo "Cloning repo $REPO..."
+          git clone https://x-access-token:$TOKEN@github.com/$REPO.git target_repo
+          cd target_repo
 
           echo "Validating if branch '$BRANCH' exists on remote..."
           if git ls-remote --heads origin "$BRANCH" | grep "$BRANCH" >/dev/null; then
