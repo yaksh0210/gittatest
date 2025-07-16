@@ -4,14 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       evt:
-        description: 'Select environment/event'
+        description: 'Enter environment'
         required: true
-        type: choice
-        options:
-          - evt
-          - dev
-          - qa
-          - prod
       branch:
         description: 'Branch name to tag'
         required: true
@@ -55,4 +49,4 @@ jobs:
           echo "Pushing tag '$TAG' to origin..."
           git push origin "$TAG"
 
-          echo "✅ Tag '$TAG' created and pushed successfully."
+          echo "Tag '$TAG' created and pushed successfully."
