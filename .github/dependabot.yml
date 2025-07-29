@@ -1,0 +1,23 @@
+version: 2
+updates:
+  # Monitor and update npm dependencies (Node.js/React.js)
+  - package-ecosystem: "npm"
+    directory: "/"  # The directory where your package.json is located (root)
+    schedule:
+      interval: "weekly"  # Check for updates weekly (can also be 'daily' or 'monthly')
+    # Optional: Ignore certain dependencies from being updated
+    ignore:
+      - dependency-name: "react"
+        versions: ["^17.0.0"]  # Example of ignoring updates for a specific version range
+      - dependency-name: "react-dom"
+        versions: ["^17.0.0"]
+
+  # For checking development dependencies (optional if you want to include dev dependencies)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # You can optionally specify additional settings for dev dependencies or tools like Babel, Webpack, etc.
+    # Example:
+    # - dependency-name: "webpack"
+    #   versions: ["^5.0.0"]
