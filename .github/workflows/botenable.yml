@@ -21,8 +21,12 @@ jobs:
 
       - name: Set Git identity
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Authenticate with GitHub using token
+        run: |
+          git remote set-url origin https://github-actions[bot]:${{ secrets.NEW_TOKEN }}@github.com/${{ github.repository }}
 
       - name: Create or Update dependabot.yml file
         env:
