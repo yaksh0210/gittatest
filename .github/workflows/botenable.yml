@@ -31,19 +31,16 @@ jobs:
             exit 1
           fi
 
-          # Combine owner and repo name
-          FULL_REPO_NAME="$OWNER/$REPO_NAME"
-          
-          # API URL to enable Dependabot Alerts with the dynamic owner and repo name
-          API_URL="https://api.github.com/repos/$OWNER/$REPO_NAME/dependabot/alerts"
-          
+          # API URL to enable Dependabot Alerts (Security Alerts feature)
+          API_URL="https://api.github.com/repos/$OWNER/$REPO_NAME/alerts"
+
           # Enable Dependabot Alerts by sending the PUT request with correct headers
           curl -L \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             -X PUT \
-            -d '{"enabled":true}' \
+            -d '{"enabled": true}' \
             "$API_URL"
 
-          echo "Dependabot Alerts have been enabled for $FULL_REPO_NAME"
+          echo "Dependabot Alerts have been enabled for $OWNER/$REPO_NAME"
