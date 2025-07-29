@@ -35,7 +35,7 @@ jobs:
           FULL_REPO_NAME="$OWNER/$REPO_NAME"
           
           # API URL to enable Dependabot Alerts
-          API_URL="https://api.github.com/repos/$OWNER/$REPO_NAME/dependabot/alerts"
+          API_URL="https://api.github.com/repos/OWNER/REPO_NAME/dependabot/alerts"
           
           # Enable Dependabot Alerts by setting the permissions
           curl -X PUT -H "Authorization: token $GITHUB_TOKEN" -d '{"enabled":true}' $API_URL
