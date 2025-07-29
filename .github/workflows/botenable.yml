@@ -1,13 +1,12 @@
 name: Dependabot Alert Workflow
-
 on:
   push:
     branches:
-      - master  # This will run the action on any push to the main branch
+      - master  
     paths:
       - '**/package.json'  # This ensures it only runs if package.json is modified
       - '**/package-lock.json'
-      - '**'
+      - '**/requirement.txt'
   pull_request:
     branches:
       - master  # You can also trigger on pull requests to the main branch
@@ -19,13 +18,13 @@ jobs:
     steps:
       # Step 1: Checkout the repository code
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Step 2: Set up Node.js environment
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
 
       # Step 3: Install dependencies
       - name: Install dependencies
@@ -40,7 +39,7 @@ jobs:
       - name: Check vulnerabilities and create alert
         run: |
           if grep -q '"vulnerabilities"' audit-report.json; then
-            echo "🚨 Vulnerabilities found! Please review." | mail -s "Dependabot Alert: Vulnerabilities Detected" <your-email@example.com>
+            echo "🚨 Vulnerabilities found! Please review." 
           else
             echo "✅ No vulnerabilities found."
           fi
