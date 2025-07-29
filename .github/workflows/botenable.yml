@@ -3,6 +3,10 @@ name: Enable GHAS Bot
 on:
   workflow_dispatch:
     inputs:
+      owner:
+        description: 'Owner of the repository (e.g., user or org name)'
+        required: true
+        type: string
       repo_name:
         description: 'Name of the repository'
         required: true
@@ -17,18 +21,23 @@ jobs:
 
       - name: Enable GHAS Bot
         env:
-          GITHUB_TOKEN: ${{ secrets.NEW_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          OWNER=${{ github.event.inputs.owner }}
           REPO_NAME=${{ github.event.inputs.repo_name }}
-          if [ -z "$REPO_NAME" ]; then
-            echo "Repository name is required."
+          
+          if [ -z "$OWNER" ] || [ -z "$REPO_NAME" ]; then
+            echo "Both owner and repository name are required."
             exit 1
           fi
 
+          # Combine owner and repo name
+          FULL_REPO_NAME="$OWNER/$REPO_NAME"
+          
           # API URL to enable GHAS bot
-          API_URL="https://api.github.com/repos/$REPO_NAME/actions/permissions"
+          API_URL="https://api.github.com/repos/$FULL_REPO_NAME/actions/permissions"
           
           # Enable GHAS Bot by setting the permissions for security analysis
           curl -X PUT -H "Authorization: token $GITHUB_TOKEN" -d '{"enabled":true}' $API_URL
 
-          echo "GHAS Bot has been enabled for $REPO_NAME"
+          echo "GHAS Bot has been enabled for $FULL_REPO_NAME"
