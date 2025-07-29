@@ -7,9 +7,10 @@ on:
     paths:
       - '**/package.json'  # This ensures it only runs if package.json is modified
       - '**/package-lock.json'
+      - '**'
   pull_request:
     branches:
-      - main  # You can also trigger on pull requests to the main branch
+      - master  # You can also trigger on pull requests to the main branch
 
 jobs:
   dependency-check:
