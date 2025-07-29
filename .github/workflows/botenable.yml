@@ -1,4 +1,4 @@
-name: Enable GHAS Bot
+name: Enable Dependabot Alerts
 
 on:
   workflow_dispatch:
@@ -13,13 +13,13 @@ on:
         type: string
 
 jobs:
-  enable-ghas-bot:
+  enable-dependabot-alerts:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v2
 
-      - name: Enable GHAS Bot
+      - name: Enable Dependabot Alerts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -34,10 +34,10 @@ jobs:
           # Combine owner and repo name
           FULL_REPO_NAME="$OWNER/$REPO_NAME"
           
-          # API URL to enable GHAS bot
-          API_URL="https://api.github.com/repos/OWNER/REPO/actions/permissions"
+          # API URL to enable Dependabot Alerts
+          API_URL="https://api.github.com/repos/$OWNER/$REPO_NAME/dependabot/alerts"
           
-          # Enable GHAS Bot by setting the permissions for security analysis
+          # Enable Dependabot Alerts by setting the permissions
           curl -X PUT -H "Authorization: token $GITHUB_TOKEN" -d '{"enabled":true}' $API_URL
 
-          echo "GHAS Bot has been enabled for $FULL_REPO_NAME"
+          echo "Dependabot Alerts have been enabled for $FULL_REPO_NAME"
