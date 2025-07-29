@@ -1,73 +1,45 @@
-name: Configure Dependabot via dependabot.yml
+name: Dependabot Alert Workflow
 
 on:
-  workflow_dispatch:
-    inputs:
-      owner:
-        description: 'Owner of the repository (e.g., user or org name)'
-        required: true
-        type: string
-      repo_name:
-        description: 'Name of the repository'
-        required: true
-        type: string
+  push:
+    branches:
+      - main  # This will run the action on any push to the main branch
+    paths:
+      - '**/package.json'  # This ensures it only runs if package.json is modified
+      - '**/package-lock.json'
+  pull_request:
+    branches:
+      - main  # You can also trigger on pull requests to the main branch
 
 jobs:
-  setup-dependabot:
+  dependency-check:
     runs-on: ubuntu-latest
+
     steps:
+      # Step 1: Checkout the repository code
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set Git identity
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Run a dependency audit (checks for vulnerabilities)
+      - name: Run npm audit
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          npm audit --json > audit-report.json
 
-      - name: Authenticate with GitHub using token
+      # Step 5: Parse the audit report and create alerts
+      - name: Check vulnerabilities and create alert
         run: |
-          git remote set-url origin https://github-actions[bot]:${{ secrets.NEW_TOKEN }}@github.com/${{ github.repository }}
-
-      - name: Create or Update dependabot.yml file
-        env:
-          GITHUB_TOKEN: ${{ secrets.NEW_TOKEN }}
-        run: |
-          OWNER=${{ github.event.inputs.owner }}
-          REPO_NAME=${{ github.event.inputs.repo_name }}
-
-          if [ -z "$OWNER" ] || [ -z "$REPO_NAME" ]; then
-            echo "Both owner and repository name are required."
-            exit 1
-          fi
-
-          # Define the path to the dependabot.yml file
-          DEPENDABOT_CONFIG_PATH=".github/dependabot.yml"
-
-          # Define the content for the dependabot.yml file
-          DEPENDABOT_CONFIG_CONTENT="
-          version: 2
-          updates:
-            - package-ecosystem: 'npm' # Change this based on your ecosystem, e.g., 'npm', 'pip', 'maven'
-              directory: '/' # Path to the package manager files (root or specific folder)
-              schedule:
-                interval: 'weekly' # Other options: 'daily', 'monthly'
-              allow:
-                - dependency-type: 'direct'
-          "
-
-          # Check if the dependabot.yml file exists
-          if [ -f "$DEPENDABOT_CONFIG_PATH" ]; then
-            echo "dependabot.yml already exists, updating it..."
+          if grep -q '"vulnerabilities"' audit-report.json; then
+            echo "🚨 Vulnerabilities found! Please review." | mail -s "Dependabot Alert: Vulnerabilities Detected" <your-email@example.com>
           else
-            echo "Creating dependabot.yml..."
+            echo "✅ No vulnerabilities found."
           fi
-
-          # Write the content to dependabot.yml
-          echo "$DEPENDABOT_CONFIG_CONTENT" > "$DEPENDABOT_CONFIG_PATH"
-          
-          # Commit and push the changes
-          git add "$DEPENDABOT_CONFIG_PATH"
-          git commit -m "Configure Dependabot via dependabot.yml"
-          git push
-
-          echo "Dependabot configuration has been set up for $OWNER/$REPO_NAME"
