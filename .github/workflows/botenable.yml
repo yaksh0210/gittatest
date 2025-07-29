@@ -35,7 +35,7 @@ jobs:
           FULL_REPO_NAME="$OWNER/$REPO_NAME"
           
           # API URL to enable GHAS bot
-          API_URL="https://api.github.com/repos/$FULL_REPO_NAME/actions/permissions"
+          API_URL="https://api.github.com/repos/OWNER/REPO/actions/permissions"
           
           # Enable GHAS Bot by setting the permissions for security analysis
           curl -X PUT -H "Authorization: token $GITHUB_TOKEN" -d '{"enabled":true}' $API_URL
