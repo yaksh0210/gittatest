@@ -1,0 +1,24 @@
+version: 2
+          updates:
+            - package-ecosystem: 'npm' # Change to your ecosystem: 'npm', 'pip', 'maven'
+              directory: '/' # Path to package manager files
+              schedule:
+                interval: 'weekly' # Can also be 'daily' or 'monthly'
+          "
+
+          # Check if the dependabot.yml file already exists
+          if [ -f "$DEPENDABOT_CONFIG_PATH" ]; then
+            echo "dependabot.yml already exists, updating it..."
+          else
+            echo "Creating dependabot.yml..."
+          fi
+
+          # Create or update the dependabot.yml file in the repository
+          echo "$DEPENDABOT_CONFIG_CONTENT" > "$DEPENDABOT_CONFIG_PATH"
+          
+          # Commit and push the changes
+          git add "$DEPENDABOT_CONFIG_PATH"
+          git commit -m "Enable Dependabot alerts via dependabot.yml"
+          git push
+
+          echo "Dependabot configuration has been set up for $OWNER/$REPO_NAME"
