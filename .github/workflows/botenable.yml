@@ -3,7 +3,7 @@ name: Dependabot Alert Workflow
 on:
   push:
     branches:
-      - main  # This will run the action on any push to the main branch
+      - master  # This will run the action on any push to the main branch
     paths:
       - '**/package.json'  # This ensures it only runs if package.json is modified
       - '**/package-lock.json'
