@@ -11,10 +11,10 @@ if (navigator.geolocation) {
     let errMessage = err.message
     // API only allowed on localhost and HTTPS domains
     if (err.message.startsWith('Only secure origins are allowed')) {
-      errMessage = 'getCurrentPosition API only works on secure (HTTPS) domains'
+      errMessage = 'getCurrentPosition API only works on secure (HTTPS) domain'
     }
     error.classList.add('show')
-    error.textContent = errMessage + '. Will fall back to showing weather for London'
+    error.textContent = errMessage + '. Will fall back to showing weather for London City'
 
     getWeather({ coords: { latitude: 51.40329, longitude: 0.05619 } })
   })
