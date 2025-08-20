@@ -5,14 +5,3 @@ updates:
     directory: "/"  # The directory where your package.json is located (root)
     schedule:
       interval: "daily"  # Check for updates weekly
-    ignore:
-      - dependency-name: "react"
-        versions: ["^17.0.0"]  # Example: Ignore updates for React 17.x.x
-      - dependency-name: "react-dom"
-        versions: ["^17.0.0"]
-
-  # Optional: Check for updates on devDependencies (Webpack, Babel, etc.)
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "daily"
