@@ -1,6 +1,5 @@
 version: 2
 updates:
-  # Monitor and update npm dependencies (Node.js/React.js)
   - package-ecosystem: "npm"
     directory: "/"  # The directory where your package.json is located (root)
     schedule:
@@ -11,8 +10,12 @@ updates:
       - dependency-name: "react-dom"
         versions: ["^17.0.0"]
 
-  # Optional: Check for updates on devDependencies (Webpack, Babel, etc.)
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "daily"
+      
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"

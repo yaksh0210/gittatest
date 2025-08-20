@@ -1,0 +1,102 @@
+name: Enable Dependabot
+on:
+  workflow_dispatch:
+    inputs:
+      target_repo:
+        description: 'Target repo in format owner/repo'
+        required: true
+      package_ecosystem:
+        description: 'Package ecosystem (e.g., npm, maven, pip)'
+        default: 'npm'
+      directory:
+        description: 'Directory where manifest is located'
+        default: '/'
+      schedule_interval:
+        description: 'Update interval (e.g., daily, weekly)'
+        default: 'weekly'
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  enable-security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enable Advanced Security, Secret Scanning, etc.
+        run: |
+          curl -X PATCH \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${{ github.repository }} \
+            -d '{
+              "security_and_analysis": {
+                "code_security": { "status": "enabled" },
+                "code_scanning": { "status": "enabled" },
+                "secret_scanning": { "status": "enabled" },
+                "secret_scanning_ai_detection" : { "status": "enabled" },
+                "secret_scanning_non_provider_patterns": { "status": "enabled" },
+                "secret_scanning_push_protection": { "status": "enabled" },
+                "dependabot_security_updates": { "status": "enabled" }
+              }
+            }'
+  enable-dependabot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate dependabot.yml content
+        id: generate
+        run: |
+          cat <<EOF > dependabot.yml
+          version: 2
+          updates:
+            - package-ecosystem: "${{ github.event.inputs.package_ecosystem }}"
+              directory: "${{ github.event.inputs.directory }}"
+              schedule:
+                interval: "${{ github.event.inputs.schedule_interval }}"
+              groups:
+                security-updates:
+                  applies-to: "security-updates"
+          EOF
+
+      - name: Base64 encode file content
+        id: encode
+        run: |
+          content=$(base64 -w 0 dependabot.yml)
+          echo "content=$content" >> $GITHUB_OUTPUT
+
+      - name: Create or update dependabot.yml via GitHub API
+        env:
+          GH_TOKEN: ${{ github.event.inputs.github_token }}
+        run: |
+          owner_repo="${{ github.event.inputs.target_repo }}"
+          file_path=".github/dependabot.yml"
+          api_url="https://api.github.com/repos/$owner_repo/contents/$file_path"
+
+          # Check if file exists
+          response=$(curl -s -H "Authorization: token $GH_TOKEN" $api_url)
+          sha=$(echo "$response" | jq -r .sha)
+
+          if [ "$sha" != "null" ]; then
+            echo "File exists. Updating..."
+          else
+            echo "File does not exist. Creating new."
+            sha=""
+          fi
+
+          json=$(jq -n \
+            --arg message "Enable Dependabot" \
+            --arg content "${{ steps.encode.outputs.content }}" \
+            --arg path "$file_path" \
+            --arg branch "main" \
+            --arg sha "$sha" \
+            '{
+              message: $message,
+              content: $content,
+              path: $path,
+              branch: $branch
+            } + (if $sha != "" then {sha: $sha} else {} end)')
+
+          curl -s -X PUT -H "Authorization: token $GH_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$json" \
+            "$api_url"
