@@ -4,9 +4,3 @@ updates:
     directory: "/"  # The directory where your package.json is located (root)
     schedule:
       interval: "daily"  # Check for updates weekly
-
-  # Optional: Check for updates on devDependencies (Webpack, Babel, etc.)
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "daily"

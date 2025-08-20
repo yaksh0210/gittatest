@@ -1,11 +1,11 @@
 {
   "name": "package-2",
-  "version": "1.0.2",
+  "version": "1.0.6",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
-  "description": "new package"
+  "description": "New package"
 }
