@@ -39,7 +39,7 @@ jobs:
       - name: Check vulnerabilities and create alert
         run: |
           if grep -q '"vulnerabilities"' audit-report.json; then
-            echo "🚨 Vulnerabilities found! Please review." 
+            echo " Vulnerabilities found! Please review." 
           else
-            echo "✅ No vulnerabilities found."
+            echo " o vulnerabilities found."
           fi
